@@ -3,7 +3,6 @@ package main
 import (
 	"image/color"
 	"log"
-	"math"
 	"math/rand"
 	"time"
 
@@ -24,17 +23,6 @@ type Game struct {
 	width, height int
 	verts         []*Point
 	planes        [][4]int
-}
-
-func Rotate(a *Point, angle float64) {
-	a.x = a.x*math.Cos(angle) - a.y*math.Sin(angle)
-	a.y = a.x*math.Sin(angle) + a.y*math.Cos(angle)
-
-	a.x = a.x*math.Cos(angle) - a.z*math.Sin(angle)
-	a.z = a.x*math.Sin(angle) + a.z*math.Cos(angle)
-
-	a.y = a.y*math.Cos(angle) + a.z*math.Sin(angle)
-	a.z = -a.y*math.Sin(angle) + a.z*math.Cos(angle)
 }
 
 func NewGame(width, height int) *Game {
