@@ -3,6 +3,7 @@ package main
 import (
 	"image/color"
 	"log"
+	"math"
 	"math/rand"
 	"time"
 
@@ -55,30 +56,63 @@ func (g *Game) CameraProject(p, s *Point) {
 	p.z -= s.z
 }
 
+func (g *Game) CameraRotateY(p *Point, angle float64) {
+	p.x = p.x*math.Cos(angle) + p.z*math.Sin(angle)
+	p.z = -p.x*math.Sin(angle) + p.z*math.Cos(angle)
+}
+
+func (g *Game) CameraRotateX(p *Point, angle float64) {
+	p.y = p.y*math.Cos(angle) - p.z*math.Sin(angle)
+	p.z = p.y*math.Sin(angle) + p.z*math.Cos(angle)
+}
+
 func (g *Game) Update() error {
 	dir := &Point{}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
+	var angleY, angleX float64
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
 		dir.y = 1
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW) {
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
 		dir.y = -1
 	}
-	if (ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS)) &&
-		(ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW)) {
+	if ebiten.IsKeyPressed(ebiten.KeyS) &&
+		ebiten.IsKeyPressed(ebiten.KeyW) {
 		dir.y = 0
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
 		dir.x = 1
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		dir.x = -1
 	}
-	if (ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD)) &&
-		(ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA)) {
+	if ebiten.IsKeyPressed(ebiten.KeyD) &&
+		ebiten.IsKeyPressed(ebiten.KeyA) {
 		dir.x = 0
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		angleX = math.Pi / 360
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		angleX = -math.Pi / 360
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) &&
+		ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		angleX = 0
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		angleY = -math.Pi / 360
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		angleY = math.Pi / 360
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) &&
+		ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		angleY = 0
 	}
 	for _, p := range g.verts {
 		g.CameraProject(p, dir)
+		g.CameraRotateY(p, angleY)
+		g.CameraRotateX(p, angleX)
 	}
 	return nil
 }
