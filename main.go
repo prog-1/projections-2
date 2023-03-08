@@ -25,6 +25,7 @@ type (
 	game struct {
 		p      [8]point
 		planes [][2]int
+		camera point
 	}
 )
 
@@ -83,44 +84,35 @@ func Dot(a, b point) float64 {
 
 func (g *game) Layout(outWidth, outHeight int) (w, h int) { return screenWidth, screenHeight }
 
+func CameraProject(p point) point {
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		p.z -= 10
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		p.x -= 10
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		p.z += 10
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		p.x += 10
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyShift) {
+		p.y -= 10
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyControl) {
+		p.y += 10
+	}
+	return p
+}
+
 func (g *game) Update() error {
 	// g.rotateX()
 	// g.rotateY()
 	// g.rotateZ()
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		for i := range g.p {
-			g.p[i].z -= 10
-		}
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		for i := range g.p {
-			g.p[i].x -= 10
-		}
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		for i := range g.p {
-			g.p[i].z += 10
-		}
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		for i := range g.p {
-			g.p[i].x += 10
-		}
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyShift) {
-		for i := range g.p {
-			g.p[i].y -= 10
-		}
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyControl) {
-		for i := range g.p {
-			g.p[i].y += 10
-		}
-	}
+	g.camera = CameraProject(g.camera)
 	return nil
 }
 
@@ -135,10 +127,10 @@ func (g *game) Draw(screen *ebiten.Image) {
 		// if Dot(cross, Add(Divide(center, center.z), p)) < 0 {
 		for i1 := i; i1 < i+4; i1++ {
 			ebitenutil.DrawLine(screen,
-				(g.p[g.planes[i1][0]].x/(g.p[g.planes[i1][0]].z+1500))*-900+float64(screenWidth/2),
-				(g.p[g.planes[i1][0]].y/(g.p[g.planes[i1][0]].z+1500))*-900+float64(screenHeight/2),
-				(g.p[g.planes[i1][1]].x/(g.p[g.planes[i1][1]].z+1500))*-900+float64(screenWidth/2),
-				(g.p[g.planes[i1][1]].y/(g.p[g.planes[i1][1]].z+1500))*-900+float64(screenHeight/2),
+				((g.p[g.planes[i1][0]].x+g.camera.x)/(g.p[g.planes[i1][0]].z+g.camera.z+1500))*-900+float64(screenWidth/2),
+				((g.p[g.planes[i1][0]].y+g.camera.y)/(g.p[g.planes[i1][0]].z+g.camera.z+1500))*-900+float64(screenHeight/2),
+				((g.p[g.planes[i1][1]].x+g.camera.x)/(g.p[g.planes[i1][1]].z+g.camera.z+1500))*-900+float64(screenWidth/2),
+				((g.p[g.planes[i1][1]].y+g.camera.y)/(g.p[g.planes[i1][1]].z+g.camera.z+1500))*-900+float64(screenHeight/2),
 				color.White)
 		}
 
