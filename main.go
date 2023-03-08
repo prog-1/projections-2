@@ -66,9 +66,14 @@ func (g *Game) CameraRotateX(p *Point, angle float64) {
 	p.z = p.y*math.Sin(angle) + p.z*math.Cos(angle)
 }
 
+func (g *Game) CameraRotateZ(p *Point, angle float64) {
+	p.x = p.x*math.Cos(angle) - p.y*math.Sin(angle)
+	p.y = p.x*math.Sin(angle) + p.y*math.Cos(angle)
+}
+
 func (g *Game) Update() error {
 	dir := &Point{}
-	var angleY, angleX float64
+	var angleY, angleX, angleZ float64
 	if ebiten.IsKeyPressed(ebiten.KeyS) {
 		dir.y = 1
 	}
@@ -88,6 +93,16 @@ func (g *Game) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyD) &&
 		ebiten.IsKeyPressed(ebiten.KeyA) {
 		dir.x = 0
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyR) {
+		dir.z = 1
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyF) {
+		dir.z = -1
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyR) &&
+		ebiten.IsKeyPressed(ebiten.KeyF) {
+		dir.z = 0
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
 		angleX = math.Pi / 360
@@ -109,10 +124,21 @@ func (g *Game) Update() error {
 		ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
 		angleY = 0
 	}
+	if ebiten.IsKeyPressed(ebiten.KeyControl) {
+		angleZ = -math.Pi / 360
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyShift) {
+		angleZ = math.Pi / 360
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyControl) &&
+		ebiten.IsKeyPressed(ebiten.KeyShift) {
+		angleZ = 0
+	}
 	for _, p := range g.verts {
 		g.CameraProject(p, dir)
 		g.CameraRotateY(p, angleY)
 		g.CameraRotateX(p, angleX)
+		g.CameraRotateZ(p, angleZ)
 	}
 	return nil
 }
