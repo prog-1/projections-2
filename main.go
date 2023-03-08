@@ -109,9 +109,9 @@ func CameraProject(p point) point {
 }
 
 func (g *game) Update() error {
-	// g.rotateX()
-	// g.rotateY()
-	// g.rotateZ()
+	g.rotateX()
+	g.rotateY()
+	g.rotateZ()
 	g.camera = CameraProject(g.camera)
 	return nil
 }
