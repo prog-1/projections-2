@@ -3,6 +3,7 @@ package main
 import (
 	"image/color"
 	"log"
+	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -21,15 +22,23 @@ type Game struct {
 	cp        point    //cube central point
 	cube     [8]point // cube points
 	edges      [][2]int // cube edges
+	cam camera//camera
 }
 
 type point struct {
 	x, y, z float64
 }
 
+type camera struct {
+	x,y,z float64
+}
+
 //---------------------------Update-------------------------------------
 
 func (g *Game) Update() error {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight){
+		g.cam.moveRight()
+	}
 	return nil
 }
 
@@ -55,6 +64,10 @@ func (g *Game) drawLine(screen *ebiten.Image, a, b point) {
 }
 
 //-------------------------Functions----------------------------------
+
+func (c *camera) moveRight(){
+	fmt.Println("move right")
+}
 
 //central projection
 func cproj(p *point, cp point, k float64) {
@@ -91,6 +104,7 @@ func main() {
 //New game instance function
 func NewGame(width, height int) *Game {
 
+	//GAME
 	//center point
 	cp := point{sW / 2, sH / 2, 100}
 
@@ -113,5 +127,10 @@ func NewGame(width, height int) *Game {
 		{0,4}, {1,5}, {2,6}, {3,7},
 	}
 
-	return &Game{width: width, height: height, cp: cp, cube: cube, edges: edges}
+
+	//CAMERA
+	cam := camera{sW/2, sH/2, 0}
+
+	//RETURN
+	return &Game{width: width, height: height, cp: cp, cube: cube, edges: edges, cam: cam}
 }
