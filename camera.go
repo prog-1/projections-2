@@ -3,7 +3,6 @@ package main
 import (
 	"image/color"
 	"log"
-	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -19,7 +18,6 @@ const (
 type Game struct {
 	width, height int //screen width and height
 	//global variables
-	r         rotator  //point rotation angle on all axis
 	cp        point    //cube central point
 	cube     [8]point // cube points
 	edges      [][2]int // cube edges
@@ -29,24 +27,15 @@ type point struct {
 	x, y, z float64
 }
 
-type rotator struct {
-	x, y, z float64
-}
-
 //---------------------------Update-------------------------------------
 
 func (g *Game) Update() error {
-	//cube point rotation
-	for i := range g.cube {
-		g.cube[i].rotate(g.r, g.cp)
-	}
 	return nil
 }
 
 //---------------------------Draw-------------------------------------
 
 func (g *Game) Draw(screen *ebiten.Image) {
-
 	//cube drawing without normals and stuff	
 	for i := range g.edges {
 		g.drawLine(screen, g.cube[g.edges[i][0]], g.cube[g.edges[i][1]])
@@ -77,23 +66,6 @@ func cproj(p *point, cp point, k float64) {
 	y1 := (p.y / z1) * k
 
 	p.x, p.y = x1, y1
-}
-
-//rotates the point on given angle on all axis
-func (p *point) rotate(r rotator, cp point) {
-
-	//X plane
-	p.y = p.y*math.Cos(r.x) + p.z*math.Sin(r.x)
-	p.z = -p.y*math.Sin(r.x) + p.z*math.Cos(r.x)
-
-	//Y plane
-	p.x = p.x*math.Cos(r.y) - p.z*math.Sin(r.y)
-	p.z = p.x*math.Sin(r.y) + p.z*math.Cos(r.y)
-
-	//Z plane
-	p.x = p.x*math.Cos(r.z) - p.y*math.Sin(r.z)
-	p.y = p.x*math.Sin(r.z) + p.y*math.Cos(r.z)
-
 }
 
 //---------------------------Main-------------------------------------
@@ -141,9 +113,5 @@ func NewGame(width, height int) *Game {
 		{0,4}, {1,5}, {2,6}, {3,7},
 	}
 
-	//rotator
-	var r rotator //rotation angle for each axis
-	r.x, r.y, r.z = 0, math.Pi/200, 0
-
-	return &Game{width: width, height: height, r: r, cp: cp, cube: cube, edges: edges}
+	return &Game{width: width, height: height, cp: cp, cube: cube, edges: edges}
 }
