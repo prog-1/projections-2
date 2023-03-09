@@ -31,17 +31,23 @@ type point struct {
 //---------------------------Update-------------------------------------
 
 func (g *Game) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
 		g.cam.x++
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		g.cam.x--
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+	if ebiten.IsKeyPressed(ebiten.KeyE) {
 		g.cam.y++
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		g.cam.y--
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		g.cam.z++
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		g.cam.z--
 	}
 
 	return nil
@@ -62,9 +68,11 @@ func (g *Game) drawLine(screen *ebiten.Image, a, b point) {
 	//camera modification
 	a.x -= g.cam.x
 	a.y += g.cam.y
+	a.z -= g.cam.z
 
 	b.x -= g.cam.x
 	b.y += g.cam.y
+	b.z -= g.cam.z
 
 	//central projection
 	k := float64(400)
