@@ -3,7 +3,7 @@ module github.com/34thSchool/projections-2
 go 1.19
 
 require (
-	github.com/34thSchool/vectors v0.0.0-20230318150246-8aa667c939b9
+	github.com/34thSchool/vectors v0.0.3
 	github.com/hajimehoshi/ebiten/v2 v2.4.18
 )
 

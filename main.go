@@ -3,7 +3,7 @@ package main
 import (
 	"image/color"
 	"log"
-	"math"
+	"time"
 
 	v "github.com/34thSchool/vectors"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,85 +11,116 @@ import (
 )
 
 const (
-	screenWidth  = 1920
-	screenHeight = 1080
+	screenWidth  = 1280
+	screenHeight = 720
 )
 
 func CentralProjection(a v.Vec, k float64) v.Vec {
 	return v.Vec{
-		-(a.X / a.Z) * k,
-		-(a.Y / a.Z) * k,
-		-k,
+		X: a.X / a.Z * k,
+		Y: a.Y / a.Z * k,
+	}
+
+}
+
+func DrawLine(screen *ebiten.Image, g *game, a, b v.Vec, clr color.Color) {
+	halfWidth, halfHeight := float64(screenWidth/2), float64(screenHeight/2)
+
+	a, b = v.Sub(a, g.Cam.Pos), v.Sub(b, g.Cam.Pos)
+
+	k := float64(250)
+	a, b = CentralProjection(a, k), CentralProjection(b, k)
+	ebitenutil.DrawLine(screen, a.X+halfWidth, -a.Y+halfHeight, b.X+halfWidth, -b.Y+halfHeight, clr)
+}
+
+type Cube struct {
+	P [8]v.Vec
+}
+
+func (c *Cube) Draw(screen *ebiten.Image, g *game, clr color.Color) {
+	for _, f := range [][]int{
+		{0, 1, 2, 3}, // Near
+		{7, 6, 5, 4}, // Far
+		{4, 5, 1, 0}, // Left
+		{1, 5, 6, 2}, // Top
+		{3, 2, 6, 7}, // Right
+		{4, 0, 3, 7}, // Bottom
+	} {
+		DrawLine(screen, g, c.P[f[0]], c.P[f[1]], clr)
+		DrawLine(screen, g, c.P[f[1]], c.P[f[2]], clr)
+		DrawLine(screen, g, c.P[f[2]], c.P[f[3]], clr)
+		DrawLine(screen, g, c.P[f[3]], c.P[f[0]], clr)
 	}
 }
 
-func DrawLine(screen *ebiten.Image, a, b v.Vec, clr color.Color) {
-	k := float64(-250)
-	a = CentralProjection(a, k)
-	b = CentralProjection(b, k)
-	ebitenutil.DrawLine(screen, a.X, a.Y, b.X, b.Y, color.RGBA{255, 102, 204, 255})
+type Camera struct {
+	Pos   v.Vec
+	Speed float64
 }
 
-func RotateCube(c *v.Cube, r v.Rotator, screen *ebiten.Image) {
-	&c.
-	ctr := v.Add(v.Div(v.Sub(c.p[6], c.p[0]), 2), c.p[0])
-	for i := range c.p {
-		c.p[i] = v.Sub(c.p[i], ctr)
-		c.p[i].Rotate(r)
-		c.p[i] = v.Add(c.p[i], ctr)
+func (Cam *Camera) ProcessMovement(dt float64) {
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		Cam.Pos.X += Cam.Speed * dt
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		Cam.Pos.X -= Cam.Speed * dt
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyE) {
+		Cam.Pos.Y += Cam.Speed * dt
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyQ) {
+		Cam.Pos.Y -= Cam.Speed * dt
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		Cam.Pos.Z += Cam.Speed * dt
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		Cam.Pos.Z -= Cam.Speed * dt
 	}
 }
 
 type game struct {
-	c            []Cube
-	screenBuffer *ebiten.Image
+	C             []Cube
+	Cam           Camera
+	prevFrameTime int64
+	screenBuffer  *ebiten.Image
 }
 
 func NewGame() *game {
-	halfWidth, halfHeight := float64(screenWidth/2), float64(screenHeight/2)
 	return &game{
 		[]Cube{
 			{
 				[8]v.Vec{
-					{-200 + halfWidth, -200 + halfHeight, 200}, // NearBottomLeft
-					{-200 + halfWidth, 200 + halfHeight, 200},  // NearTopLeft
-					{200 + halfWidth, 200 + halfHeight, 200},   // NearTopRight
-					{200 + halfWidth, -200 + halfHeight, 200},  // NearBottomRightS
+					{-200, -200, 400}, // NearBottomLeft
+					{-200, 200, 400},  // NearTopLeft
+					{200, 200, 400},   // NearTopRight
+					{200, -200, 400},  // NearBottomRight
 
-					{-200 + halfWidth, -200 + halfHeight, 250}, // FarBottomLeft
-					{-200 + halfWidth, 200 + halfHeight, 250},  // FarTopLeft
-					{200 + halfWidth, 200 + halfHeight, 250},   // FarTopRight
-					{200 + halfWidth, -200 + halfHeight, 250},  // FarBottomRight
+					{-200, -200, 800}, // FarBottomLeft
+					{-200, 200, 800},  // FarTopLeft
+					{200, 200, 800},   // FarTopRight
+					{200, -200, 800},  // FarBottomRight
 				},
 			},
-			// {
-			// 	[8]v.Vec{
-			// 		{-400 + halfWidth, -200 + halfHeight, 200}, // NearBottomLeft
-			// 		{-400 + halfWidth, 200 + halfHeight, 200},  // NearTopLeft
-			// 		{halfWidth, 200 + halfHeight, 200},         // NearTopRight
-			// 		{halfWidth, -200 + halfHeight, 200},        // NearBottomRight
-
-			// 		{-400 + halfWidth, -200 + halfHeight, 600}, // FarBottomLeft
-			// 		{-400 + halfWidth, 200 + halfHeight, 600},  // FarTopLeft
-			// 		{halfWidth, 200 + halfHeight, 600},         // FarTopRight
-			// 		{halfWidth, -200 + halfHeight, 600},        // FarBottomRight
-			// 	},
-			// },
 		},
+		Camera{v.Vec{0, 0, 0}, 1},
+		0,
 		ebiten.NewImage(screenWidth, screenHeight),
 	}
 }
 
 func (g *game) Layout(outWidth, outHeight int) (w, h int) { return screenWidth, screenHeight }
 func (g *game) Update() error {
-	for i := range g.c {
-		g.c[i].Rotate(g.screenBuffer, Rotator{0, 0, math.Pi / 180})
-	}
+	dt := float64(time.Now().UnixMilli() - g.prevFrameTime)
+	g.prevFrameTime = time.Now().UnixMilli()
+
+	g.Cam.ProcessMovement(dt)
+
 	return nil
 }
 func (g *game) Draw(screen *ebiten.Image) {
-	for i := range g.c {
-		g.c[i].Draw(screen, color.RGBA{255, 102, 204, 255})
+	for i := range g.C {
+		g.C[i].Draw(screen, g, color.RGBA{255, 102, 204, 255})
 	}
 	screen.DrawImage(g.screenBuffer, &ebiten.DrawImageOptions{})
 }
@@ -97,6 +128,7 @@ func (g *game) Draw(screen *ebiten.Image) {
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	g := NewGame()
+
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}

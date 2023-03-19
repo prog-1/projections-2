@@ -1,5 +1,5 @@
-github.com/34thSchool/vectors v0.0.0-20230318150246-8aa667c939b9 h1:/pd0IXdNB7dEvkPHOp8N7+xWmUMoC7O5xcJ4G/qyEmA=
-github.com/34thSchool/vectors v0.0.0-20230318150246-8aa667c939b9/go.mod h1:odIoj/eZEc719kKmwIrnyJI+cCQHDqpfq5AsctIbM7c=
+github.com/34thSchool/vectors v0.0.3 h1:hZjOEy+vM9//IqrWxE8j4oCMd+pyRXL22rW6EDzVuY4=
+github.com/34thSchool/vectors v0.0.3/go.mod h1:odIoj/eZEc719kKmwIrnyJI+cCQHDqpfq5AsctIbM7c=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ebitengine/purego v0.0.0-20220905075623-aeed57cda744 h1:A8UnJ/5OKzki4HBDwoRQz7I6sxKsokpMXcGh+fUxpfc=
 github.com/ebitengine/purego v0.0.0-20220905075623-aeed57cda744/go.mod h1:Eh8I3yvknDYZeCuXH9kRNaPuHEwvXDCk378o9xszmHg=
