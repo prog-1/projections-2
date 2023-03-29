@@ -105,9 +105,28 @@ func (g *Game) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyE) {
 		g.camera.y -= 1
 	}
-	g.c.RotateX(math.Pi / 1000)
-	g.c.RotateY(math.Pi / 750)
-	g.c.RotateZ(math.Pi / 450)
+	if ebiten.IsKeyPressed(ebiten.KeyI) {
+		g.c.RotateX(math.Pi / 360)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyK) {
+		g.c.RotateX(-math.Pi / 360)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyK) {
+		g.c.RotateX(-math.Pi / 360)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyJ) {
+		g.c.RotateY(-math.Pi / 360)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyL) {
+		g.c.RotateY(math.Pi / 360)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyU) {
+		g.c.RotateZ(math.Pi / 360)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyU) {
+		g.c.RotateZ(-math.Pi / 360)
+
+	}
 
 	return nil
 }
