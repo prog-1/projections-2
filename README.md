@@ -11,3 +11,6 @@ Projections on an arbitrary plane
     3. Implement a function that projects coordinates $(x, y, z)$ of an arbitrary point in the "world" coordinate system to coordinates $(x', y', z')$ in the "camera" coordinate system, e.g. `func (g Game) CameraProject(p Point) Point`.
     
     4. Start implementation with adding support for the camera movement in a single axis (e.g. `Y`).
+
+## Result
+![](Projection.gif)
